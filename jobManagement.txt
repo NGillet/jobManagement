@@ -1,0 +1,204 @@
+
+import numpy as np
+import os, sys
+
+def mkdir(path):
+    try :
+        os.mkdir(path)
+    except OSError:
+        pass
+
+SCRIPT = "curie"
+DATA_FOLDER = "/amphora/nicolas.gillet/" # "./" ### where to put the simulation folder
+IC_FOLDER = "/amphora/nicolas.gillet/ICs/B10_128/ics_emma/level_007" #"~/WORKDIR/ICs/B7_256/ics_emma/level_008" # "IC/
+SRC_FOLDER = "~/EMMA"
+EXEC_NAME = "emmacpu"
+
+class job():
+    #job_ID = -1
+    #SIM_NAME = 'default'
+    #FOLDER = 'default'
+    #status = 'NOT' ### NOT: do not exist, PEN, RUN, ABT: had run but not finish, FIN
+    #restart = False ### need a restart ?
+    
+    def __init__( self, SIM_NAME='default' ):
+        ### 
+        self.job_ID = -1
+        self.SIM_NAME = SIM_NAME
+        self.FOLDER = DATA_FOLDER + self.SIM_NAME
+        self.status = 'NOT' 
+        self.restart = False
+        
+        ### init the folder
+        mkdir( self.FOLDER )
+        mkdir("%s/data/"%(self.FOLDER))
+        self._copy_param()
+        os.system( "ln -s %s %s/"%(IC_FOLDER, self.FOLDER ) )
+        
+        self._write_slurm_sub() 
+        self._edit_params()
+        
+    def print_job( self ):
+        print( "ID     NAME     STATUS" )
+        print( "%d     %s     %s"%(self.job_ID,self.SIM_NAME,self.status) )
+        
+    def _copy_param( self ):   
+        try :    
+            os.system( "ln -s %s %s/SRC"%(SRC_FOLDER, self.FOLDER ) )
+            os.system("cp %s/SRC/param.run %s/data/"%(self.FOLDER,self.FOLDER) )
+            os.system("cp %s/SRC/param.run %s"%(self.FOLDER,self.FOLDER) )
+            os.system("cp %s/SRC/param.run.grid_output %s"%(self.FOLDER,self.FOLDER) )
+            os.system("cp %s/SRC/param.run.part_output %s"%(self.FOLDER,self.FOLDER) )
+            os.system("cp %s/SRC/param.run.list_aexp %s"%(self.FOLDER,self.FOLDER) )
+            #os.system("cp %s/SRC/param.mk %s/SRC/"%(FOLDER))
+            ### and copy the exec 
+            os.system("cp %s/SRC/emmacpu %s"%(self.FOLDER,self.FOLDER) )
+        except OSError:
+            print( "JOB : %s, copy_param error"%(self.SIM_NAME) )
+        
+    def _write_slurm_sub( self ):
+        pass
+    
+    def _edit_params( self ):
+        pass
+    
+    def launch():
+        os.system( "cd %s"%(self.FOLDER) )
+        os.system( "ccc_msub job_emma > job_ID" )
+        self._read_job_ID()
+        self.status = 'PEN' ### by default the job is pending at the submission 
+        
+    def _read_job_ID():
+        with open('%s/job_ID') as file:
+            self.job_ID = file.readline().split[4]
+    
+    def get_status():
+        log_flag = self._read_log()
+        mpp_out  = self._read_mpp()
+        
+        if log_flag==0 : ### job finish
+            return 'FIN' 
+        elif log_flag==1 : ### log file exist, job not finish
+            ### job RUN or ABT
+            pass
+        else:
+            
+            if mpp_out: ### job not in the PEN or RUN list
+                if log_flag==1 : ### the job had run
+                    self.status = 'FIN' 
+                    self.restart = False 
+    
+    def _read_log():
+        """
+        0 : job finish
+        1 : not finish, but is/has run
+        2 : job didnt run
+        """
+        if os.path.isfile( self.FOLDER+'/run.log' ):
+            ### log file exist
+            ### so the run has been running (at least) once
+            is_job_finnish = os.popen( 'grep \'Done ..... in\' ' + self.FOLDER+'/run.log' )
+            if len(is_job_finnish)>1 :
+                return 0
+            else:
+                ### job not finish
+                ### still running or aborted ?
+                return 1
+        else:
+            ### log file do not exist
+            ### job is NOT or PEN ?
+            return 2
+            
+            
+    def _read_mpp():
+        """
+        0 : job in list, PEN or RUN or suspend
+        1 : job not in list -> FIN or aborted or NOT
+        """
+        ### look at PEN, RUN
+        mpp_out = os.popen( "ccc_mpp -u gilletnj" )        
+        dummy = list_of_jobs.readline()
+        flag_job_in = False
+        for line in mpp_out:
+                if len( line.split() ) > 1:
+                    ID = int(line.split()[2])
+                    status = int(line.split()[6])
+                    if self.job_ID == ID:
+                        #self.status = status 
+                        return status
+                        #print( line.split()[11] )
+                # line.split()
+        return 1
+    
+    def _read_macct():
+        ### look at PEN, FIN or aborted jobs
+        macct_out = os.popen( 'ccc_macct '+str(self.job_ID) )
+    
+    def update():
+        pass
+
+test_job = job( SIM_NAME='test_sim' )
+
+test_job.print_job()
+
+
+
+import os, sys
+SCRIPT="curie"
+DATA_FOLDER="data/"
+IC_FOLDER="IC/"
+RUN_NAME=""
+if len(sys.argv) > 1:
+    RUN_NAME=sys.argv[1]
+FOLDER = DATA_FOLDER+RUN_NAME
+def build():
+    if os.system("make"):
+        print ("Build failed")
+        exit()
+def link_IC():
+    ic_folder = "%s/%s"%(os.getcwd(),IC_FOLDER)
+    os.system("ln -fs %s/level_* %s"%(ic_folder, FOLDER ))
+
+def copy_param():
+    mkdir("%s/data/"%(FOLDER))
+    os.system("cp param.run %s/data/"%(FOLDER))
+    mkdir("%s/SRC/"%(FOLDER))
+    os.system("cp param.run %s/SRC/"%(FOLDER))
+    os.system("cp param.run.grid_output %s/SRC/"%(FOLDER))
+    os.system("cp param.run.part_output %s/SRC/"%(FOLDER))
+    os.system("cp param.run.list_aexp %s/SRC/"%(FOLDER))
+    os.system("cp param.mk %s/SRC/"%(FOLDER))
+def copy_exec():
+    for line in open("Makefile"):
+        if "CPU" in line:
+            os.system("cp emmacpu %s"%(FOLDER))
+            return 0
+        if "GPU" in line:
+            os.system("cp emmagpu %s"%(FOLDER))
+            return 0
+def init():
+    mkdir(FOLDER)
+    copy_exec()
+    copy_param()
+    link_IC()
+    os.system("cp -r src %s/SRC/src"%(FOLDER))
+    os.system("cp scripts/%s %s/%s"%(SCRIPT,FOLDER,RUN_NAME))
+def get_script_type():
+    file = RUN_NAME
+    for line in open(file):
+        if "#SBATCH" in line:
+            return "sbatch "
+        if "#MSUB" in line:
+            return "ccc_msub "
+        if "#PBS" in line:
+            return "qsub "
+    return "./"
+def launch():
+    os.chdir(FOLDER)
+#   print(os.pwd)
+    script_type = get_script_type()
+    os.system("%s%s"%(script_type, RUN_NAME))
+if __name__ == "__main__":
+#   build()
+    init()
+    launch()
