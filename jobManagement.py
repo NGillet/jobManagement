@@ -317,6 +317,8 @@ class job():
         log_flag = self._read_log()
         mpp_out  = self._read_mpp()
         
+        self.comments = ''
+        
         if log_flag==0 : ### job finish
             return 'FIN'
         
@@ -577,7 +579,7 @@ class listOfJobs():
         """
         print_all = not(only_restart) and not(only_finish) and not(only_NOT)
         
-        print( "ID          NAME        STATUS          RESTART      COMMENT" )
+        print( "ID          NAME        STATUS  RESTART      COMMENT" )
         for s in range(self.NUMBER_OF_SIMS):
             
             if only_restart and self.list_of_jobs[s].restart :
