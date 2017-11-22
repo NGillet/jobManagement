@@ -385,16 +385,21 @@ class job():
             ### job is NOT or PEN ?
             return 2
             
-    def _read_mpp( self ):
+    def _read_mpp( self, mpp_out=None ):
         """
         extract for list of jobs the status 
-        0 : job in list, RUN
-        1 : job in list, PEN
-        2 : job not in list, ABT or FIN
-        3 : job in list but other status (suspended ?)
+        input:
+            - mpp_out: os.popen, return of the mpp command, default='None'
+                       useful for list of jobs
+        return:
+            0 : job in list, RUN
+            1 : job in list, PEN
+            2 : job not in list, ABT or FIN
+            3 : job in list but other status (suspended ?)
         """
         ### look at PEN, RUN
-        mpp_out = os.popen( "ccc_mpp -u gilletnj" )        
+        if mpp_out==None:
+            mpp_out = os.popen( "ccc_mpp -u gilletnj" )
         dummy = mpp_out.readline()
         flag_job_in = False
         for line in mpp_out:
@@ -545,12 +550,22 @@ class listOfJobs():
         """
         print("UPDATE JOB LIST")
         tin = time()
+        ### get once mpp return for all jobs
+        mpp_out = self._get_mpp()
         for s in range(self.NUMBER_OF_SIMS):
-            self.list_of_jobs[s].update_job()
+            self.list_of_jobs[s].update_job( mpp_out=mpp_out )
             #self.list_status[s]    = self.list_of_jobs[s].status
             #self.list_restart[s]   = self.list_of_jobs[s].restart
             
             loadbar( s, self.NUMBER_OF_SIMS, tin )
+            
+    def _get_mpp( self ):
+        """
+        return the mpp command, 
+        """
+        ### look at PEN, RUN
+        mpp_out = os.popen( "ccc_mpp -u gilletnj" )        
+        return mpp_out
             
     def print_list( self, only_restart=False, only_finish=False, only_NOT=False ):
         """
