@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 import numpy as np
 import os, sys
@@ -185,7 +185,7 @@ class paramter_class( OrderedDict ):
             file.write( "zmax %d\n"%(self['zmax']) )
 
 
-# In[2]:
+# In[ ]:
 
 class job():
     """
