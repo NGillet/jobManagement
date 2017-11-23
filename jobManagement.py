@@ -257,12 +257,12 @@ class job():
             #os.system("cp %s/SRC/param.run.part_output %s"%(self.FOLDER,self.FOLDER) )
             #os.system("cp %s/SRC/param.run.list_aexp %s"%(self.FOLDER,self.FOLDER) )
             #os.system("cp %s/SRC/param.mk %s/SRC/"%(FOLDER))
-            os.system("cp %sparam.run %s/data/"%(self.DATA_FOLDER,self.FOLDER) )
-            os.system("cp %sparam.run %s"%(self.DATA_FOLDER,self.FOLDER) )
-            os.system("cp %sparam.run.grid_output %s"%(self.DATA_FOLDER,self.FOLDER) )
-            os.system("cp %sparam.run.part_output %s"%(self.DATA_FOLDER,self.FOLDER) )
-            os.system("cp %sparam.run.list_aexp %s"%(self.DATA_FOLDER,self.FOLDER) )
-            os.system("cp %sparam.mk %s/SRC/"%(FOLDER))
+            os.system("cp %sparam.run %s/data/"%(DATA_FOLDER,self.FOLDER) )
+            os.system("cp %sparam.run %s"%(DATA_FOLDER,self.FOLDER) )
+            os.system("cp %sparam.run.grid_output %s"%(DATA_FOLDER,self.FOLDER) )
+            os.system("cp %sparam.run.part_output %s"%(DATA_FOLDER,self.FOLDER) )
+            os.system("cp %sparam.run.list_aexp %s"%(DATA_FOLDER,self.FOLDER) )
+            #os.system("cp %sparam.mk %s/SRC/"%(FOLDER))
             ### and copy the exec 
             os.system("cp %s/SRC/emmacpu %s"%(self.FOLDER,self.FOLDER) )
         except OSError:
