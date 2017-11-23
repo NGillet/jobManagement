@@ -515,7 +515,7 @@ class listOfJobs():
         ### init the list of jobs
         tin = time()
         for s in range(self.NUMBER_OF_SIMS):
-            self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME+'%03d'%(s), existing=existing )
+            self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME_TEMPLATE+'%03d'%(s), existing=existing )
             loadbar( s, self.NUMBER_OF_SIMS, tin )
             
             
@@ -536,6 +536,7 @@ class listOfJobs():
 
     def _existing( self, SIM_NAME=SIM_NAME_TEMPLATE ):
         """
+        USELESS
         To create a list of jobs from an already created database
         input:
             - SIM_NAME : str, the template of the simulations' folders name, default=SIM_NAME_TEMPLATE (/!\see global variable)
@@ -543,25 +544,6 @@ class listOfJobs():
         tin = time()
         for s in range(self.NUMBER_OF_SIMS):
             self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME+'%03d'%(s), existing=True )
-            
-            #self.list_job_ID[s]    = self.list_of_jobs[s].job_ID
-            #self.list_SIM_NAME[s]  = self.list_of_jobs[s].SIM_NAME
-            #self.list_FOLDER[s]    = self.list_of_jobs[s].FOLDER
-            #self.list_status[s]    = self.list_of_jobs[s].status
-            #self.list_restart[s]   = self.list_of_jobs[s].restart
-            #self.list_comments[s]  = self.list_of_jobs[s].comments
-            
-            loadbar( s, self.NUMBER_OF_SIMS, tin )
-            
-        def _non_existing( self, SIM_NAME=SIM_NAME_TEMPLATE ):
-        """
-        To create a list of jobs
-        input:
-            - SIM_NAME : str, the template of the simulations' folders name, default=SIM_NAME_TEMPLATE (/!\see global variable)
-        """
-        tin = time()
-        for s in range(self.NUMBER_OF_SIMS):
-            self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME+'%03d'%(s), existing=False )
             
             #self.list_job_ID[s]    = self.list_of_jobs[s].job_ID
             #self.list_SIM_NAME[s]  = self.list_of_jobs[s].SIM_NAME
