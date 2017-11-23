@@ -337,7 +337,7 @@ class job():
                 return 'PEN'
             elif mpp_out==2: 
                 return 'NOT'
-            elif mpp_out==3
+            elif mpp_out==3:
                 self.comments = 'LOOK BY HAND : \'ccc_mpp -u gilletnj\''
                 return 'ERR'
             
@@ -354,7 +354,7 @@ class job():
                 return 'PEN'
             elif mpp_out==2: 
                 return 'ABT'
-            elif mpp_out==3
+            elif mpp_out==3:
                 return 'ERR'
              
     def _read_log( self ):
