@@ -62,14 +62,14 @@ class parameter_class( OrderedDict ):
         - FOLDER   : str , the simulation folder containning/will contain the param.run file
         - existing : bool, if the file already exist and had to be read, default=False
     use:
-    > param = paramter_class( FOLDER, existing=existing )
+    > param = parameter_class( FOLDER, existing=existing )
     > # edit a param e.g.
     > param["overdensity_cond"] = 100
     > param.write_params() # overwrite the existing param.run file
     """
     
     def __init__( self, FOLDER, existing=False, *arg, **kw ):
-        super(paramter_class, self).__init__(*arg, **kw)
+        super(parameter_class, self).__init__(*arg, **kw)
         
         self.FOLDER = FOLDER
         
