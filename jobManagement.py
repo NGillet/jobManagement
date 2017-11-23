@@ -44,7 +44,7 @@ if SCRIPT=='NEFERTEM':
     SIM_NAME_TEMPLATE='sim_'
     
 if SCRIPT=='curie':
-    DATA_FOLDER = "/ccc/cont005/home/ra3945/gilletnj/SCRATCHDIR/grid_LHS" ### where to put the simulation folder, ALSO WHERE THE LAUNCH SCRIPT IS USED!
+    DATA_FOLDER = "/ccc/cont005/home/ra3945/gilletnj/SCRATCHDIR/grid_LHS/" ### where to put the simulation folder, ALSO WHERE THE LAUNCH SCRIPT IS USED!
     IC_FOLDER = "/ccc/cont005/home/ra3945/gilletnj/WORKDIR/ICs/B7_256/ics_emma/level_008" ### initail condition folder
     SRC_FOLDER = "/ccc/cont005/home/ra3945/gilletnj/EMMA" ### SOURCE CODE FOLDER
     EXEC_NAME = "emmacpu" ### executable name
@@ -54,7 +54,7 @@ if SCRIPT=='curie':
 
 # In[ ]:
 
-class paramter_class( OrderedDict ):
+class parameter_class( OrderedDict ):
     """
     Class to read/write the param.run file
     
@@ -215,7 +215,7 @@ class job():
         self.status = 'NOT' ### PEN, RUN, FIN, ABT, NOT
         self.restart = False
         self.comments = comments
-        self.params = paramter_class( self.FOLDER, existing=existing )
+        self.params = parameter_class( self.FOLDER, existing=existing )
         
         ### new job 
         ### init the folder
@@ -508,8 +508,16 @@ class listOfJobs():
         #self.list_restart  = np.ndarray( (NUMBER_OF_SIMS,), dtype=np.bool )
         #self.list_comments = np.chararray( (NUMBER_OF_SIMS,), itemsize=self.SIZE_OF_NAMES )
         
-        if( existing ):
-            self._existing( SIM_NAME=SIM_NAME_TEMPLATE )
+        ### USELESS
+        #if( existing ):
+        #    self._existing( SIM_NAME=SIM_NAME_TEMPLATE )
+        
+        ### init the list of jobs
+        tin = time()
+        for s in range(self.NUMBER_OF_SIMS):
+            self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME+'%03d'%(s), existing=existing )
+            loadbar( s, self.NUMBER_OF_SIMS, tin )
+            
             
     def __getattr__( self, key ):
         if   key == 'job_ID':
@@ -535,6 +543,25 @@ class listOfJobs():
         tin = time()
         for s in range(self.NUMBER_OF_SIMS):
             self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME+'%03d'%(s), existing=True )
+            
+            #self.list_job_ID[s]    = self.list_of_jobs[s].job_ID
+            #self.list_SIM_NAME[s]  = self.list_of_jobs[s].SIM_NAME
+            #self.list_FOLDER[s]    = self.list_of_jobs[s].FOLDER
+            #self.list_status[s]    = self.list_of_jobs[s].status
+            #self.list_restart[s]   = self.list_of_jobs[s].restart
+            #self.list_comments[s]  = self.list_of_jobs[s].comments
+            
+            loadbar( s, self.NUMBER_OF_SIMS, tin )
+            
+        def _non_existing( self, SIM_NAME=SIM_NAME_TEMPLATE ):
+        """
+        To create a list of jobs
+        input:
+            - SIM_NAME : str, the template of the simulations' folders name, default=SIM_NAME_TEMPLATE (/!\see global variable)
+        """
+        tin = time()
+        for s in range(self.NUMBER_OF_SIMS):
+            self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME+'%03d'%(s), existing=False )
             
             #self.list_job_ID[s]    = self.list_of_jobs[s].job_ID
             #self.list_SIM_NAME[s]  = self.list_of_jobs[s].SIM_NAME
