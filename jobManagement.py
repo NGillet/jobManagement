@@ -306,25 +306,25 @@ class job():
         except:
             pass
             
-    def update_job( self ):
+    def update_job( self, mpp_out=None ):
         """
         update the job's status and the need-restart-flag
         allow to to follow the jobs throught time
         """
         self._read_job_ID()
-        new_status = self._get_status()
+        new_status = self._get_status( mpp_out=mpp_out )
         self.status = new_status ### PEN, RUN, FIN, ABT, NOT
         if new_status=='ABT' :
             self.restart = True
         else:
             self.restart = False
     
-    def _get_status( self ):
+    def _get_status( self, mpp_out=None ):
         """
         return the job's status from the logfile and the jobs list
         """
         log_flag = self._read_log()
-        mpp_out  = self._read_mpp()
+        mpp_out  = self._read_mpp( mpp_out=mpp_out )
         
         self.comments = ''
         
@@ -503,7 +503,7 @@ class listOfJobs():
     > myList_load.SIM_NAME
     > myList_load.print_list( )
     """
-    def __init__( self, NUMBER_OF_SIMS, existing=False, load=True ):
+    def __init__( self, NUMBER_OF_SIMS, existing=False, load=True, fileListOfParams=None ):
         
         self.SIZE_OF_NAMES = 128 ### hard coded string size for names 
         
@@ -524,9 +524,30 @@ class listOfJobs():
         ### init the list of jobs
         tin = time()
         for s in range(self.NUMBER_OF_SIMS):
+            
             self.list_of_jobs[s] = job( SIM_NAME=SIM_NAME_TEMPLATE+'%03d'%(s), existing=existing )
             loadbar( s, self.NUMBER_OF_SIMS, tin )
             
+        self.fileListOfParams = fileListOfParams
+        try:
+            self.setup_job_params( filename=fileListOfParams )
+        except:
+            print( 'No file to init the parameters.' )
+           
+    def _read_LHS_param( self, filename="SimSuit_LHS_grid.dat" ):
+        DATA = np.loadtxt( filename )
+        with open( "SimSuit_LHS_grid_2.dat" ) as f:
+            f.readline()
+            PARAM = f.readline().split()[2:]
+        return DATA, PARAM
+    
+    def setup_job_params( self, filename="SimSuit_LHS_grid.dat" )
+        DATA, PARAM = self._read_LHS_param( filename=filename )
+        for ij, job in enumerate(self.list_of_jobs):
+            for ip, p in enumerate(PARAM):
+                job.params[p] = DATA[:,ip+1]
+            job.params.write_params()
+        
             
     def __getattr__( self, key ):
         if   key == 'job_ID':
