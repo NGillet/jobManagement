@@ -294,14 +294,17 @@ class job():
         
         #num_lines = sum(1 for line in open('myfile.txt'))
         
-        with open( '%s/job_ID'%(self.FOLDER), 'r' ) as file:
-            ### read all the line until the last one which is the last submitjob
-            for l in file:
-                #l = file.readline()
-                pass
-            new_job_ID = int( l.split()[3] )
-            # print(new_job_ID)
-            self.job_ID = new_job_ID
+        try:
+            with open( '%s/job_ID'%(self.FOLDER), 'r' ) as file:
+                ### read all the line until the last one which is the last submitjob
+                for l in file:
+                    #l = file.readline()
+                    pass
+                new_job_ID = int( l.split()[3] )
+                # print(new_job_ID)
+                self.job_ID = new_job_ID
+        except:
+            pass
             
     def update_job( self ):
         """
