@@ -73,7 +73,7 @@ class parameter_class( OrderedDict ):
         
         self.FOLDER = FOLDER
         
-        self._read_param_file( existing=existing )
+        self._read_param_file(  )
         
         self.existing = existing
         
@@ -217,7 +217,7 @@ class job():
         self.status = 'NOT' ### PEN, RUN, FIN, ABT, NOT
         self.restart = False
         self.comments = comments
-        self.params = parameter_class( self.FOLDER, existing=existing )
+        self.params = parameter_class( self.FOLDE, existing=existing )
         self.existing = existing
         
         ### new job 
