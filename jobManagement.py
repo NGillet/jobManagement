@@ -75,9 +75,11 @@ class parameter_class( OrderedDict ):
         
         self._read_param_file( existing=existing )
         
+        self.existing = existing
         
-    def _read_param_file( self, existing=False ):
-        if existing:
+        
+    def _read_param_file( self ):
+        if self.existing:
             fileName = self.FOLDER+"/param.run"
         else:
             fileName = DATA_FOLDER+"/param.run"
@@ -216,16 +218,17 @@ class job():
         self.restart = False
         self.comments = comments
         self.params = parameter_class( self.FOLDER, existing=existing )
+        self.existing = existing
         
         ### new job 
         ### init the folder
-        if( not(existing) ):
+        if( not(self.existing) ):
             mkdir( self.FOLDER )
             mkdir("%s/data/"%(self.FOLDER))
             self._copy_param()
             os.system( "ln -s %s %s/"%(IC_FOLDER, self.FOLDER ) )
 
-            self._write_slurm_sub() 
+            self._write_slurm_sub()
             self.params.write_params()
         
         ### old job 
@@ -546,6 +549,8 @@ class listOfJobs():
             for ip, p in enumerate(PARAM):
                 job.params[p] = DATA[ij,ip+1]
             job.params.write_params()
+            job.existing=True
+            job.params.existing=True
             
     def __getattr__( self, key ):
         if   key == 'job_ID':
@@ -651,9 +656,9 @@ class listOfJobs():
         self.update()
         ### then restart all jobs that need to be restarted
         count = 0
-        for s in range(self.NUMBER_OF_SIMS):
-            if self.list_of_jobs[s].restart :
-                self.list_of_jobs[s].launch()
+        for job in self.list_of_jobs:
+            if job.restart :
+                job.launch()
                 count += 1
         print( '%d jobs restarted'%count )
         
