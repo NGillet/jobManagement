@@ -456,9 +456,6 @@ class job():
         launch the job on the cluster
         /!\ for the moment it is hard coded for CURIE
         """
-        ### TODO modify here the param init 
-        ### should not be done here but outside!
-        ### overdensity_cond=45, feedback_eff=0, efficiency=0
         
         if self.restart:
             restart_snap = self._find_restart_number()        
@@ -530,11 +527,11 @@ class listOfJobs():
             loadbar( s, self.NUMBER_OF_SIMS, tin )
             
         self.fileListOfParams = fileListOfParams
-        try:
-            print( 'Update parameters' )
-            self.setup_job_params( filename=fileListOfParams )
-        except:
+        if( fileListOfParams==None ):
             print( 'No file to init the parameters.' )
+        else:
+            self.setup_job_params(  )
+            print( 'Update parameters' )
            
     def _read_LHS_param( self ):
         DATA = np.loadtxt(  self.fileListOfParams )
