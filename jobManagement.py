@@ -72,11 +72,8 @@ class parameter_class( OrderedDict ):
         super(parameter_class, self).__init__(*arg, **kw)
         
         self.FOLDER = FOLDER
-        
-        self._read_param_file(  )
-        
         self.existing = existing
-        
+        self._read_param_file(  )    
         
     def _read_param_file( self ):
         if self.existing:
