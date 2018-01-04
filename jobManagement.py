@@ -531,6 +531,7 @@ class listOfJobs():
             
         self.fileListOfParams = fileListOfParams
         try:
+            print( 'Update parameters' )
             self.setup_job_params( filename=fileListOfParams )
         except:
             print( 'No file to init the parameters.' )
