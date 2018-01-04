@@ -6,7 +6,7 @@
 import numpy as np
 import os, sys
 import pickle
-from time import time ### for loading bar
+from time import time, sleep ### for loading bar
 
 from collections import OrderedDict
 
@@ -460,10 +460,11 @@ class job():
         ### should not be done here but outside!
         ### overdensity_cond=45, feedback_eff=0, efficiency=0
         
-        restart_snap = self._find_restart_number()        
-        self.params['restart_snap']=restart_snap=restart_snap
-        ### make sure the param.run file is up to date
-        self.params.write_params()
+        if self.restart:
+            restart_snap = self._find_restart_number()        
+            self.params['restart_snap']=restart_snap
+            ### make sure the param.run file is up to date
+            self.params.write_params()
         
         here = os.popen( 'pwd' )
         here_str = here.readline()[:-1]
@@ -534,20 +535,19 @@ class listOfJobs():
         except:
             print( 'No file to init the parameters.' )
            
-    def _read_LHS_param( self, filename="SimSuit_LHS_grid.dat" ):
-        DATA = np.loadtxt( filename )
-        with open( "SimSuit_LHS_grid_2.dat" ) as f:
+    def _read_LHS_param( self ):
+        DATA = np.loadtxt(  self.fileListOfParams )
+        with open(  self.fileListOfParams ) as f:
             f.readline()
             PARAM = f.readline().split()[2:]
         return DATA, PARAM
     
-    def setup_job_params( self, filename="SimSuit_LHS_grid.dat" )
-        DATA, PARAM = self._read_LHS_param( filename=filename )
+    def setup_job_params( self ):
+        DATA, PARAM = self._read_LHS_param(  )
         for ij, job in enumerate(self.list_of_jobs):
             for ip, p in enumerate(PARAM):
-                job.params[p] = DATA[:,ip+1]
+                job.params[p] = DATA[ij,ip+1]
             job.params.write_params()
-        
             
     def __getattr__( self, key ):
         if   key == 'job_ID':
@@ -658,6 +658,14 @@ class listOfJobs():
                 self.list_of_jobs[s].launch()
                 count += 1
         print( '%d jobs restarted'%count )
+        
+    def launch( self ):
+        ### first update jobs status
+        self.update()
+        for job in self.list_of_jobs:
+            job.launch()
+            
+        self.update()
         
 ######
 ######
