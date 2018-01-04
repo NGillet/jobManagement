@@ -549,6 +549,11 @@ class listOfJobs():
             job.existing=True
             job.params.existing=True
             
+    def _update_params( self ):
+        for ij, job in enumerate(self.list_of_jobs):
+            job.params._read_param_file(  )
+            job.params.write_params(  )
+            
     def __getattr__( self, key ):
         if   key == 'job_ID':
             return np.array( [ self.list_of_jobs[s].job_ID for s in range(self.NUMBER_OF_SIMS) ] )
@@ -687,7 +692,10 @@ def load( fileName='listOFJobs_save.pickle' ):
     return:
         - Class listOfJobs object
     """
-    return pickle.load( open(fileName,'rb') )
+    
+    listOfJobs = pickle.load( open(fileName,'rb') )
+    listOfJobs._update_params()
+    return listOfJobs
 
 
 # In[ ]:
