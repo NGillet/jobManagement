@@ -314,6 +314,7 @@ class job():
         self._read_job_ID()
         new_status = self._get_status( mpp_out=mpp_out )
         self.status = new_status ### PEN, RUN, FIN, ABT, NOT
+        print( new_status )
         if new_status=='ABT' :
             self.restart = True
         else:
@@ -587,7 +588,6 @@ class listOfJobs():
     def update( self ):
         """
         update the jobs status by reading the log files and demand the list of running/pending jobs on the cluster
-        TODO: this may be long beacause it will do it for each jobs, where the job list (e.g. ccc_mpp -u gilletnj) may be ask just once for all jobs
         """
         print("UPDATE JOB LIST")
         tin = time()
