@@ -314,7 +314,6 @@ class job():
         self._read_job_ID()
         new_status = self._get_status( mpp_out=mpp_out )
         self.status = new_status ### PEN, RUN, FIN, ABT, NOT
-        print( new_status )
         if new_status=='ABT' :
             self.restart = True
         else:
@@ -523,11 +522,12 @@ class listOfJobs():
             loadbar( s, self.NUMBER_OF_SIMS, tin )
             
         self.fileListOfParams = fileListOfParams
-        if( fileListOfParams==None ):
-            print( 'No file to init the parameters.' )
-        else:
-            self.setup_job_params(  )
-            print( 'Update parameters' )
+        if( not(existing) ):
+            if( fileListOfParams==None ):
+                print( 'No file to init the parameters.' )
+            else:
+                self.setup_job_params(  )
+                print( 'Update parameters' )
            
     def _read_LHS_param( self ):
         DATA = np.loadtxt(  self.fileListOfParams )
