@@ -337,7 +337,7 @@ class job():
             return 'PEN'
         
         ### STATUS UNCLEAR
-        elif log_flag==1 : ### log file exist, job not finish
+        elif log_flag==1 : ### log file exist, but job not finish
         ### job RUN or ABT or PEN (from a restart)
         ### as RUN and PEN are already done above, only ABT possible
             return 'ABT'
@@ -593,13 +593,13 @@ class listOfJobs():
         tin = time()
         ### get once mpp return for all jobs
         mpp_out = self._get_mpp()
-        for s in range(self.NUMBER_OF_SIMS):
-            self.list_of_jobs[s].update_job( mpp_out=mpp_out )
+        for ij, thejob in self.list_of_jobs:
+            thejob.update_job( mpp_out=mpp_out )
             #self.list_status[s]    = self.list_of_jobs[s].status
             #self.list_restart[s]   = self.list_of_jobs[s].restart
             
-            loadbar( s, self.NUMBER_OF_SIMS, tin )
-            
+            loadbar( ij, self.NUMBER_OF_SIMS, tin )
+                        
     def _get_mpp( self ):
         """
         return the mpp command, 
