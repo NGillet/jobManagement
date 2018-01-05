@@ -328,30 +328,28 @@ class job():
         
         self.comments = ''
         
+        ### STATUS CLEARLY DEFINED
         if log_flag==0 : ### job finish
             return 'FIN'
+        if mpp_out==0 : ### job running
+            return 'RUN'
+        elif mpp_out==1 : ### job pending
+            return 'PEN'
         
+        ### STATUS UNCLEAR
         elif log_flag==1 : ### log file exist, job not finish
-            ### job RUN or ABT or PEN(from a restart)
-            if mpp_out==0 :
-                return 'RUN'
-            elif mpp_out==1 :
-                return 'PEN'
-            elif mpp_out==2 :
-                return 'ABT'
+        ### job RUN or ABT or PEN (from a restart)
+        ### as RUN and PEN are already done above, only ABT possible
+            return 'ABT'
             
-        elif log_flag==2: ### log file dont exist, job not submited or pending
-            ### job NOT or PEN
-            if mpp_out==1 :
-                return 'PEN'
-            elif mpp_out==2: 
-                return 'NOT'
-            elif mpp_out==3:
-                self.comments = 'LOOK BY HAND : \'ccc_mpp -u gilletnj\''
-                return 'ERR'
+        elif log_flag==2: ### log file doesnt exist, job not submited or pending
+        ### job NOT (not launch) or PEN (from first start)
+        ### PEN already done above, only NOT possible
+            return 'NOT'
             
         elif log_flag==3: ### log file exist, memory error detected ABT
-            ### but the job can be PEN also !
+        ### job PEN or ABT or ERR
+        ### PEN already done above, only NOT possible
             is_job_memError = os.popen( 'grep \'ERROR === Allocated\' ' + self.FOLDER+'/run.log' )
             theErrorline = is_job_memError.readline().split()
             if len(theErrorline)>1 :
@@ -359,9 +357,7 @@ class job():
                     self.comments = 'grid mem error'
                 if theErrorline[3] == 'part':
                     self.comments = 'part mem error'
-            if mpp_out==1 :
-                return 'PEN'
-            elif mpp_out==2: 
+            elif mpp_out==2:
                 return 'ABT'
             elif mpp_out==3:
                 return 'ERR'
@@ -405,7 +401,7 @@ class job():
         return:
             0 : job in list, RUN
             1 : job in list, PEN
-            2 : job not in list, ABT or FIN
+            2 : job not in list, ABT or FIN or NOT
             3 : job in list but other status (suspended ?)
         """
         ### look at PEN, RUN
@@ -414,17 +410,16 @@ class job():
         dummy = mpp_out.readline()
         flag_job_in = False
         for line in mpp_out:
-                if len( line.split() ) > 1:
-                    ID = int(line.split()[2])
-                    status = line.split()[6]
-                    if self.job_ID == ID:
-                        #self.status = status 
-                        if status=='RUN':
-                            return 0
-                        elif status=='PEN':
-                            return 1
-                        else:
-                            return 3
+            if len( line.split() ) > 1:
+                ID = int(line.split()[2])
+                status = line.split()[6]
+                if self.job_ID == ID:
+                    if status=='RUN':
+                        return 0
+                    elif status=='PEN':
+                        return 1
+                    else:
+                        return 3
         return 2
     
     def _read_out():
@@ -667,8 +662,11 @@ class listOfJobs():
     def launch( self ):
         ### first update jobs status
         self.update()
-        for job in self.list_of_jobs:
+        
+        tin = time()
+        for ij, job in enumerate(self.list_of_jobs):
             job.launch()
+            loadbar( ij, self.NUMBER_OF_SIMS, tin )
             
         self.update()
         
