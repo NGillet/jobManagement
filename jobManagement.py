@@ -593,7 +593,7 @@ class listOfJobs():
         tin = time()
         ### get once mpp return for all jobs
         mpp_out = self._get_mpp()
-        for ij, thejob in self.list_of_jobs:
+        for ij, thejob in enumerate(self.list_of_jobs):
             thejob.update_job( mpp_out=mpp_out )
             #self.list_status[s]    = self.list_of_jobs[s].status
             #self.list_restart[s]   = self.list_of_jobs[s].restart
